@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ishiguro's Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --herta-deep: #0d0b1a;
+    --herta-navy: #111428;
+    --herta-purple: #2a1f5e;
+    --herta-violet: #4a3a8a;
+    --herta-lilac: #7b5ea7;
+    --herta-lavender: #b09fd8;
+    --herta-pale: #d4c8f0;
+    --herta-white: #f0eaff;
+    --herta-gold: #c9a84c;
+    --herta-gold-light: #e8c97a;
+    --herta-blue: #3d5a8a;
+    --herta-cyan: #5a8ab0;
+    --herta-glow: rgba(180, 150, 255, 0.15);
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(180,150,255,0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--herta-deep);
+    color: var(--herta-white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== BACKGROUND ===== */
+  .bg-wrap {
+    position: fixed; inset: 0; z-index: 0;
+    transition: filter 0.4s ease;
+  }
+  .bg-wrap.blurred { filter: blur(12px) brightness(0.4); }
+  .bg-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.55;
+  }
+  .bg-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(13,11,26,0.7) 0%, rgba(42,31,94,0.5) 50%, rgba(13,11,26,0.8) 100%);
+  }
+  .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 40%, rgba(180,150,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 60%, rgba(180,150,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(2px 2px at 70% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 35%, rgba(200,170,255,0.5) 0%, transparent 100%);
+    animation: twinkle 4s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle {
+    from { opacity: 0.6; }
+    to { opacity: 1; }
+  }
+
+  /* ===== APP SHELL ===== */
+  #app {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+  }
+
+  /* ===== PAGES ===== */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+  /* ===== OVERLAY PANEL ===== */
+  .overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 100;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .overlay.active { display: flex; }
+  .overlay-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(5,3,15,0.7);
+    backdrop-filter: blur(6px);
+  }
+  .overlay-panel {
+    position: relative; z-index: 1;
+    background: linear-gradient(145deg, rgba(20,16,50,0.97), rgba(30,22,70,0.97));
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 36px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 0 60px rgba(120,80,220,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+    animation: panelIn 0.3s ease;
+  }
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ===== MAIN MENU ===== */
+  #main-menu {
+    padding: 40px 20px;
+    gap: 0;
+  }
+
+  .herta-title {
+    text-align: center;
+    margin-bottom: 60px;
+    animation: fadeSlideDown 0.8s ease;
+  }
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .herta-title .eyebrow {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--herta-lavender);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.8;
+  }
+  .herta-title h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.8rem, 5vw, 3.2rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--herta-gold-light), var(--herta-pale), var(--herta-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+  }
+  .herta-title .subtitle {
+    font-size: 0.85rem;
+    color: var(--herta-lilac);
+    letter-spacing: 0.25em;
+    margin-top: 10px;
+    text-transform: uppercase;
+  }
+  .title-divider {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--herta-gold), transparent);
+    margin: 16px auto 0;
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 600px;
+    width: 100%;
+    animation: fadeSlideUp 0.8s ease 0.2s both;
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .menu-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 32px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+  }
+  .menu-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(180,150,255,0.06), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .menu-card:hover::before { opacity: 1; }
+  .menu-card:hover {
+    border-color: var(--herta-lilac);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(120,80,220,0.3);
+  }
+  .menu-card .card-icon {
+    font-size: 2.4rem;
+    margin-bottom: 12px;
+    display: block;
+    filter: drop-shadow(0 0 8px rgba(180,150,255,0.5));
+  }
+  .menu-card .card-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--herta-pale);
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .menu-card .card-desc {
+    font-size: 0.78rem;
+    color: var(--herta-lilac);
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+  }
+  .menu-card.savings-card { grid-column: 1 / -1; }
+  .menu-card.savings-card .card-icon { font-size: 3rem; }
+
+  /* ===== SAVINGS PAGE ===== */
+  #savings-page {
+    padding: 40px 20px;
+    gap: 24px;
+  }
+
+  .page-header {
+    text-align: center;
+    animation: fadeSlideDown 0.5s ease;
+  }
+  .page-header h2 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    background: linear-gradient(135deg, var(--herta-gold-light), var(--herta-pale));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .page-header p {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    color: var(--herta-lilac);
+    font-size: 0.9rem;
+    margin-top: 4px;
+    letter-spacing: 0.1em;
+  }
+
+  .savings-display {
+    background: linear-gradient(135deg, rgba(42,31,94,0.6), rgba(74,58,138,0.3));
+    border: 1px solid var(--herta-gold);
+    border-radius: 20px;
+    padding: 40px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    max-width: 420px;
+    width: 100%;
+    animation: fadeSlideUp 0.5s ease;
+    box-shadow: 0 0 40px rgba(201,168,76,0.15), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .savings-display::after {
+    content: '✦';
+    position: absolute;
+    font-size: 8rem;
+    opacity: 0.03;
+    top: -10px; right: -10px;
+    color: var(--herta-gold);
+  }
+  .savings-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--herta-gold);
+    margin-bottom: 8px;
+  }
+  .savings-amount {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    font-weight: 900;
+    color: var(--herta-white);
+    text-shadow: 0 0 30px rgba(180,150,255,0.4);
+    line-height: 1;
+  }
+  .savings-currency {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    color: var(--herta-gold);
+    letter-spacing: 0.2em;
+    margin-top: 6px;
+  }
+
+  .savings-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 420px;
+    width: 100%;
+    animation: fadeSlideUp 0.5s ease 0.1s both;
+  }
+  .amount-input-wrap {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .amount-input-wrap .currency-tag {
+    padding: 0 14px;
+    color: var(--herta-gold);
+    font-weight: 600;
+    font-size: 1rem;
+    border-right: 1px solid var(--glass-border);
+    height: 52px;
+    display: flex; align-items: center;
+    background: rgba(201,168,76,0.08);
+  }
+  .amount-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--herta-white);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    padding: 0 16px;
+    height: 52px;
+  }
+  .amount-input::placeholder { color: rgba(176,159,216,0.4); }
+
+  .savings-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .btn-add, .btn-sub {
+    height: 52px;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.05em;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-add {
+    background: linear-gradient(135deg, #2a5a3a, #3a7a4a);
+    color: #b0f0c0;
+    border: 1px solid rgba(100,200,130,0.3);
+  }
+  .btn-add:hover {
+    background: linear-gradient(135deg, #3a7a4a, #4a9a5a);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(60,180,80,0.3);
+  }
+  .btn-sub {
+    background: linear-gradient(135deg, #5a2a2a, #7a3a3a);
+    color: #f0b0b0;
+    border: 1px solid rgba(200,100,100,0.3);
+  }
+  .btn-sub:hover {
+    background: linear-gradient(135deg, #7a3a3a, #9a4a4a);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(180,60,60,0.3);
+  }
+
+  .savings-log {
+    max-width: 420px;
+    width: 100%;
+    animation: fadeSlideUp 0.5s ease 0.2s both;
+  }
+  .log-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--herta-lilac);
+    margin-bottom: 10px;
+    padding-left: 4px;
+  }
+  .log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 180px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .log-list::-webkit-scrollbar { width: 3px; }
+  .log-list::-webkit-scrollbar-track { background: transparent; }
+  .log-list::-webkit-scrollbar-thumb { background: var(--herta-violet); border-radius: 4px; }
+  .log-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .log-item .log-op { font-weight: 700; }
+  .log-item .log-op.plus { color: #80d090; }
+  .log-item .log-op.minus { color: #d08080; }
+  .log-item .log-time { font-size: 0.72rem; color: var(--herta-lilac); }
+
+  /* ===== VAULT (APPS) PAGE ===== */
+  #vault-page { padding: 40px 20px; gap: 24px; }
+
+  .vault-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    max-width: 750px;
+    width: 100%;
+    justify-content: center;
+    animation: fadeSlideUp 0.5s ease;
+  }
+
+  .app-btn {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 160px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+  }
+  .app-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .app-btn:hover::before { opacity: 1; }
+  .app-btn:hover {
+    transform: translateY(-3px) rotate(-0.5deg);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+  .app-btn .app-ico {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+  }
+  .app-btn .app-ico img {
+    width: 100%; height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+  .app-btn .app-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--herta-pale);
+  }
+  .app-btn .app-cat {
+    font-size: 0.68rem;
+    color: var(--herta-lilac);
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+  }
+
+  /* App color themes */
+  .app-btn[data-color="green"]:hover { border-color: #4ade80; box-shadow: 0 10px 30px rgba(74,222,128,0.2); }
+  .app-btn[data-color="blue"]:hover { border-color: #60a5fa; box-shadow: 0 10px 30px rgba(96,165,250,0.2); }
+  .app-btn[data-color="red"]:hover { border-color: #f87171; box-shadow: 0 10px 30px rgba(248,113,113,0.2); }
+  .app-btn[data-color="orange"]:hover { border-color: #fb923c; box-shadow: 0 10px 30px rgba(251,146,60,0.2); }
+  .app-btn[data-color="teal"]:hover { border-color: #2dd4bf; box-shadow: 0 10px 30px rgba(45,212,191,0.2); }
+  .app-btn[data-color="purple"]:hover { border-color: #c084fc; box-shadow: 0 10px 30px rgba(192,132,252,0.2); }
+  .app-btn[data-color="yellow"]:hover { border-color: #facc15; box-shadow: 0 10px 30px rgba(250,204,21,0.2); }
+  .app-btn[data-color="cyan"]:hover { border-color: #22d3ee; box-shadow: 0 10px 30px rgba(34,211,238,0.2); }
+  .app-btn[data-color="pink"]:hover { border-color: #f472b6; box-shadow: 0 10px 30px rgba(244,114,182,0.2); }
+  .app-btn[data-color="gold"]:hover { border-color: var(--herta-gold); box-shadow: 0 10px 30px rgba(201,168,76,0.2); }
+
+  .vault-manage-btn {
+    background: transparent;
+    border: 1px dashed rgba(180,150,255,0.3);
+    border-radius: 14px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--herta-lilac);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    min-width: 160px;
+  }
+  .vault-manage-btn:hover {
+    border-color: var(--herta-lilac);
+    color: var(--herta-lavender);
+    transform: translateY(-2px);
+  }
+
+  /* ===== APP DETAIL PAGE ===== */
+  #detail-page { padding: 40px 20px; gap: 20px; }
+
+  .detail-container {
+    max-width: 600px; width: 100%;
+    display: flex; flex-direction: column; gap: 20px;
+    animation: fadeSlideUp 0.4s ease;
+  }
+  .detail-header {
+    display: flex; align-items: center; gap: 16px;
+  }
+  .detail-icon {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    object-fit: cover;
+    background: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    flex-shrink: 0;
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+  }
+  .detail-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .detail-title-wrap h2 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.4rem;
+    color: var(--herta-pale);
+  }
+  .detail-title-wrap p {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    color: var(--herta-lilac);
+    font-size: 0.85rem;
+    margin-top: 2px;
+  }
+  .detail-content {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .detail-field { display: flex; flex-direction: column; gap: 6px; }
+  .detail-field-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--herta-lilac);
+  }
+  .detail-field-value {
+    font-size: 1rem;
+    color: var(--herta-pale);
+    font-weight: 500;
+  }
+  .detail-link {
+    color: var(--herta-lavender);
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(180,150,255,0.4);
+    transition: color 0.2s;
+  }
+  .detail-link:hover { color: var(--herta-pale); }
+
+  .detail-qr, .detail-img-showcase {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+  }
+  .detail-qr img, .detail-img-showcase img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    background: rgba(0,0,0,0.3);
+    display: block;
+  }
+
+  .showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .showcase-img {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+    aspect-ratio: 1;
+    cursor: pointer;
+  }
+  .showcase-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+  .showcase-img:hover img { transform: scale(1.05); }
+
+  /* ===== MANAGE PAGE ===== */
+  #manage-page { padding: 40px 20px; gap: 24px; }
+
+  .manage-list {
+    max-width: 600px; width: 100%;
+    display: flex; flex-direction: column; gap: 10px;
+    animation: fadeSlideUp 0.4s ease;
+  }
+  .manage-item {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .manage-item .m-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .manage-item .m-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .manage-item .m-info { flex: 1; }
+  .manage-item .m-info .m-name { font-weight: 600; font-size: 0.95rem; }
+  .manage-item .m-info .m-type { font-size: 0.75rem; color: var(--herta-lilac); font-family: 'Crimson Pro', serif; font-style: italic; }
+  .manage-actions { display: flex; gap: 8px; }
+  .btn-icon {
+    width: 34px; height: 34px;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    color: var(--herta-lavender);
+  }
+  .btn-icon:hover { background: rgba(255,255,255,0.08); transform: scale(1.1); }
+  .btn-icon.del:hover { background: rgba(220,60,60,0.2); border-color: rgba(220,60,60,0.4); color: #f87171; }
+
+  .btn-add-new {
+    max-width: 600px; width: 100%;
+    background: transparent;
+    border: 1px dashed var(--herta-violet);
+    border-radius: 12px;
+    padding: 16px;
+    color: var(--herta-lilac);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    animation: fadeSlideUp 0.4s ease 0.1s both;
+  }
+  .btn-add-new:hover { border-color: var(--herta-lilac); color: var(--herta-lavender); background: rgba(255,255,255,0.03); }
+
+  /* ===== FORM ELEMENTS ===== */
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .form-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--herta-lavender);
+  }
+  .form-input, .form-select, .form-textarea {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--herta-white);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--herta-lilac);
+  }
+  .form-select { appearance: none; cursor: pointer; }
+  .form-select option { background: #1a1440; }
+  .form-textarea { resize: vertical; min-height: 80px; }
+
+  .upload-zone {
+    border: 2px dashed var(--glass-border);
+    border-radius: 10px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .upload-zone:hover { border-color: var(--herta-lilac); background: rgba(255,255,255,0.02); }
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .upload-zone .upload-text { color: var(--herta-lilac); font-size: 0.85rem; }
+  .upload-preview {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 10px;
+  }
+  .upload-preview-img {
+    width: 60px; height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid var(--glass-border);
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--herta-purple), var(--herta-violet));
+    border: 1px solid var(--herta-lilac);
+    border-radius: 10px;
+    padding: 12px 28px;
+    color: var(--herta-pale);
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.05em;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(120,80,220,0.4);
+    background: linear-gradient(135deg, var(--herta-violet), var(--herta-lilac));
+  }
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 12px 28px;
+    color: var(--herta-lilac);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .btn-secondary:hover { border-color: var(--herta-lilac); color: var(--herta-lavender); }
+
+  .overlay-btns {
+    display: flex; gap: 10px; justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  .overlay-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.1rem;
+    color: var(--herta-pale);
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  /* ===== BACK BTN ===== */
+  .back-btn {
+    position: fixed;
+    top: 24px; left: 24px;
+    z-index: 10;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    color: var(--herta-lavender);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .back-btn:hover { border-color: var(--herta-lilac); color: var(--herta-pale); transform: translateX(-2px); }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: linear-gradient(135deg, rgba(42,31,94,0.95), rgba(74,58,138,0.95));
+    border: 1px solid var(--herta-lilac);
+    border-radius: 10px;
+    padding: 12px 24px;
+    font-size: 0.9rem;
+    color: var(--herta-pale);
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    box-shadow: 0 8px 30px rgba(120,80,220,0.4);
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { border-color: #f87171; background: rgba(80,20,20,0.95); }
+  .toast.success { border-color: #4ade80; }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--herta-violet); border-radius: 4px; }
+
+  /* CONDITIONAL FIELDS */
+  .field-section { display: none; }
+  .field-section.visible { display: block; }
+
+  /* DYNAMIC FIELDS */
+  .dyn-field-row {
+    display: flex; gap: 8px; align-items: center; margin-bottom: 8px;
+  }
+  .dyn-field-row .form-input { flex: 1; }
+  .btn-del-field {
+    width: 32px; height: 32px;
+    border: 1px solid rgba(200,100,100,0.3);
+    border-radius: 6px;
+    background: rgba(180,60,60,0.1);
+    color: #f87171;
+    cursor: pointer;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .btn-del-field:hover { background: rgba(180,60,60,0.25); }
+  .btn-add-field {
+    background: transparent;
+    border: 1px dashed var(--glass-border);
+    border-radius: 7px;
+    padding: 7px 14px;
+    color: var(--herta-lilac);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  .btn-add-field:hover { border-color: var(--herta-lilac); color: var(--herta-lavender); }
+
+  /* Multi-image upload previews */
+  .multi-upload-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    margin-bottom: 6px;
+  }
+  .multi-upload-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
+  .multi-upload-item span { flex: 1; font-size: 0.82rem; color: var(--herta-lilac); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .multi-upload-item .del-img { background: none; border: none; color: #f87171; cursor: pointer; font-size: 1rem; padding: 2px 6px; }
+
+  .section-divider {
+    height: 1px;
+    background: var(--glass-border);
+    margin: 4px 0 16px;
+  }
+
+  /* responsive */
+  @media (max-width: 480px) {
+    .menu-grid { grid-template-columns: 1fr; }
+    .menu-card.savings-card { grid-column: 1; }
+    .savings-display { padding: 28px 24px; }
+    .overlay-panel { padding: 24px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg-wrap" id="bgWrap">
+  <img class="bg-img" id="bgImg" src="" alt="">
+  <div class="bg-overlay"></div>
+  <div class="stars"></div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- ===== MAIN MENU ===== -->
+  <div class="page active" id="main-menu">
+    <div class="herta-title">
+      <div class="eyebrow">Welcome to</div>
+      <h1>The Herta's Vault</h1>
+      <div class="subtitle">Personal Dashboard</div>
+      <div class="title-divider"></div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-card savings-card" onclick="showPage('savings-page')">
+        <span class="card-icon">💰</span>
+        <div class="card-title">Savings Counter</div>
+        <div class="card-desc">Track & manage your PHP balance</div>
+      </div>
+      <div class="menu-card" onclick="showPage('vault-page')">
+        <span class="card-icon">🗂️</span>
+        <div class="card-title">The Vault</div>
+        <div class="card-desc">Apps, accounts & profiles</div>
+      </div>
+      <div class="menu-card" onclick="showPage('manage-page')">
+        <span class="card-icon">⚙️</span>
+        <div class="card-title">Manage</div>
+        <div class="card-desc">Add, rename, edit & delete</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SAVINGS PAGE ===== -->
+  <div class="page" id="savings-page">
+    <button class="back-btn" onclick="showPage('main-menu')">← Back</button>
+    <div class="page-header">
+      <h2>Savings Counter</h2>
+      <p>Your personal PHP tracker</p>
+    </div>
+    <div class="savings-display">
+      <div class="savings-label">Current Balance</div>
+      <div class="savings-amount" id="savingsAmount">1,501</div>
+      <div class="savings-currency">Philippine Peso (PHP)</div>
+    </div>
+    <div class="savings-controls">
+      <div class="amount-input-wrap">
+        <div class="currency-tag">PHP</div>
+        <input class="amount-input" id="savingsInput" type="number" placeholder="Enter whole number..." min="1" step="1">
+      </div>
+      <div class="savings-btns">
+        <button class="btn-add" onclick="savingsOp('add')">＋ Add</button>
+        <button class="btn-sub" onclick="savingsOp('sub')">－ Subtract</button>
+      </div>
+    </div>
+    <div class="savings-log">
+      <div class="log-title">Transaction Log</div>
+      <div class="log-list" id="logList"></div>
+    </div>
+  </div>
+
+  <!-- ===== VAULT PAGE ===== -->
+  <div class="page" id="vault-page">
+    <button class="back-btn" onclick="showPage('main-menu')">← Back</button>
+    <div class="page-header">
+      <h2>The Vault</h2>
+      <p>All your apps & accounts</p>
+    </div>
+    <div class="vault-grid" id="vaultGrid">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+
+  <!-- ===== APP DETAIL PAGE ===== -->
+  <div class="page" id="detail-page">
+    <button class="back-btn" onclick="showPage('vault-page')">← Back</button>
+    <div class="detail-container" id="detailContainer">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+
+  <!-- ===== MANAGE PAGE ===== -->
+  <div class="page" id="manage-page">
+    <button class="back-btn" onclick="showPage('main-menu')">← Back</button>
+    <div class="page-header">
+      <h2>Manage Vault</h2>
+      <p>Create, edit & delete entries</p>
+    </div>
+    <div class="manage-list" id="manageList">
+      <!-- rendered by JS -->
+    </div>
+    <button class="btn-add-new" onclick="openAddModal()">＋ Add New Entry</button>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ===== OVERLAYS ===== -->
+
+<!-- ADD/EDIT MODAL -->
+<div class="overlay" id="editOverlay">
+  <div class="overlay-backdrop" onclick="closeOverlay('editOverlay')"></div>
+  <div class="overlay-panel" style="max-height:90vh;overflow-y:auto;">
+    <div class="overlay-title" id="editOverlayTitle">Add New Entry</div>
+    <div class="form-group">
+      <label class="form-label">Name</label>
+      <input class="form-input" id="ef-name" placeholder="e.g. Roblox">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-select" id="ef-type" onchange="updateFormFields()">
+        <option value="payment">Payment / QR (GCash, BDO…)</option>
+        <option value="social">Social Profile (Roblox, Discord, Steam…)</option>
+        <option value="game">Game Account (WuWa, PGR, UmaMusume…)</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Icon / App Image</label>
+      <div class="upload-zone" id="iconUploadZone">
+        <div class="upload-text">📷 Click to upload icon image</div>
+        <input type="file" accept="image/*" id="ef-icon" onchange="previewIcon(this)">
+        <div class="upload-preview" id="iconPreview"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Accent Color</label>
+      <select class="form-select" id="ef-color">
+        <option value="purple">Purple</option>
+        <option value="blue">Blue</option>
+        <option value="green">Green</option>
+        <option value="red">Red</option>
+        <option value="orange">Orange</option>
+        <option value="teal">Teal</option>
+        <option value="yellow">Yellow</option>
+        <option value="cyan">Cyan</option>
+        <option value="pink">Pink</option>
+        <option value="gold">Gold</option>
+      </select>
+    </div>
+
+    <!-- PAYMENT FIELDS -->
+    <div class="field-section" id="fs-payment">
+      <div class="section-divider"></div>
+      <div class="form-group">
+        <label class="form-label">QR Code Image</label>
+        <div class="upload-zone">
+          <div class="upload-text">📷 Upload your QR code</div>
+          <input type="file" accept="image/*" id="ef-qr" onchange="previewSingleFile(this,'qrPreview')">
+          <div class="upload-preview" id="qrPreview"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Account Name / Number (optional)</label>
+        <input class="form-input" id="ef-acct" placeholder="e.g. 0917-123-4567">
+      </div>
+    </div>
+
+    <!-- SOCIAL FIELDS -->
+    <div class="field-section" id="fs-social">
+      <div class="section-divider"></div>
+      <div class="form-group">
+        <label class="form-label">Profile Link</label>
+        <input class="form-input" id="ef-link" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Profile / Banner Image</label>
+        <div class="upload-zone">
+          <div class="upload-text">📷 Upload profile screenshot</div>
+          <input type="file" accept="image/*" id="ef-profile-img" onchange="previewSingleFile(this,'profileImgPreview')">
+          <div class="upload-preview" id="profileImgPreview"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME FIELDS -->
+    <div class="field-section" id="fs-game">
+      <div class="section-divider"></div>
+      <div class="form-group">
+        <label class="form-label">UID / Username</label>
+        <input class="form-input" id="ef-uid" placeholder="e.g. 123456789">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Server / Region (optional)</label>
+        <input class="form-input" id="ef-server" placeholder="e.g. Asia, SEA...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Showcase Images (characters, cards, etc.)</label>
+        <div class="upload-zone" style="cursor:default;">
+          <div class="upload-text">📷 Click to add showcase images (multi-select OK)</div>
+          <input type="file" accept="image/*" multiple id="ef-showcase" onchange="addShowcaseImages(this)">
+        </div>
+        <div id="showcaseList" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <!-- OTHER FIELDS -->
+    <div class="field-section" id="fs-other">
+      <div class="section-divider"></div>
+      <div class="form-group">
+        <label class="form-label">Custom Fields</label>
+        <div id="customFields"></div>
+        <button class="btn-add-field" onclick="addCustomField()">＋ Add field</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Notes (optional)</label>
+      <textarea class="form-textarea" id="ef-notes" placeholder="Any extra notes..."></textarea>
+    </div>
+
+    <div class="overlay-btns">
+      <button class="btn-secondary" onclick="closeOverlay('editOverlay')">Cancel</button>
+      <button class="btn-primary" onclick="saveEntry()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE MODAL -->
+<div class="overlay" id="deleteOverlay">
+  <div class="overlay-backdrop" onclick="closeOverlay('deleteOverlay')"></div>
+  <div class="overlay-panel" style="max-width:380px;text-align:center;">
+    <div style="font-size:3rem;margin-bottom:16px;">🗑️</div>
+    <div class="overlay-title" style="border:none;text-align:center;">Delete Entry</div>
+    <p style="color:var(--herta-lilac);font-family:'Crimson Pro',serif;font-size:0.95rem;margin-bottom:24px;">
+      Are you sure you want to delete <strong id="deleteEntryName" style="color:var(--herta-pale);"></strong>? This cannot be undone.
+    </p>
+    <div class="overlay-btns" style="justify-content:center;">
+      <button class="btn-secondary" onclick="closeOverlay('deleteOverlay')">Cancel</button>
+      <button class="btn-primary" style="background:linear-gradient(135deg,#5a2a2a,#7a3a3a);border-color:rgba(200,100,100,0.5);color:#f0b0b0;" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA STORE =====
+const DEFAULT_BG = ''; // will be set from uploaded image via base64
+
+let state = {
+  savings: 1501,
+  log: [],
+  entries: [
+    { id: 'gcash', name: 'GCash', type: 'payment', color: 'green', icon: null, qr: null, acct: '', notes: '' },
+    { id: 'bdo', name: 'BDO', color: 'red', type: 'payment', icon: null, qr: null, acct: '', notes: '' },
+    { id: 'roblox', name: 'Roblox', color: 'red', type: 'social', icon: null, link: '', profileImg: null, notes: '' },
+    { id: 'discord', name: 'Discord', color: 'purple', type: 'social', icon: null, link: '', profileImg: null, notes: '' },
+    { id: 'steam', name: 'Steam', color: 'blue', type: 'social', icon: null, link: '', profileImg: null, notes: '' },
+    { id: 'wuwa', name: 'Wuthering Waves', color: 'teal', type: 'game', icon: null, uid: '', server: '', showcase: [], notes: '' },
+    { id: 'uma', name: 'Uma Musume', color: 'pink', type: 'game', icon: null, uid: '', server: '', showcase: [], notes: '' },
+    { id: 'endfield', name: 'Endfield', color: 'orange', type: 'game', icon: null, uid: '', server: '', showcase: [], notes: '' },
+    { id: 'pgr', name: 'PGR', color: 'cyan', type: 'game', icon: null, uid: '', server: '', showcase: [], notes: '' },
+    { id: 'mlbb', name: 'MLBB', color: 'blue', type: 'game', icon: null, uid: '', server: '', showcase: [], notes: '' },
+    { id: 'cr', name: 'Clash Royale', color: 'orange', type: 'game', icon: null, uid: '', server: '', showcase: [], notes: '' },
+    { id: 'coc', name: 'Clash of Clans', color: 'gold', type: 'game', icon: null, uid: '', server: '', showcase: [], notes: '' },
+  ],
+  bgImage: null
+};
+
+// Accent color hex map for placeholders
+const COLOR_HEX = {
+  purple:'#7b5ea7', blue:'#5a8ab0', green:'#4a9a5a', red:'#9a4a4a',
+  orange:'#b06030', teal:'#3a9a8a', yellow:'#a09030', cyan:'#3a90b0',
+  pink:'#b05080', gold:'#c9a84c'
+};
+
+function makePlaceholder(name, color) {
+  const initials = name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const c = COLOR_HEX[color] || '#7b5ea7';
+  const uid = 'pg' + initials + Math.random().toString(36).slice(2,6);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" style="display:block;">
+    <defs>
+      <linearGradient id="${uid}" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="${c}" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="${c}" stop-opacity="0.12"/>
+      </linearGradient>
+    </defs>
+    <rect width="40" height="40" rx="10" fill="url(#${uid})"/>
+    <rect width="40" height="40" rx="10" fill="none" stroke="${c}" stroke-opacity="0.55" stroke-width="1"/>
+    <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle"
+      font-family="serif" font-size="${initials.length>1?'13':'16'}"
+      font-weight="700" fill="${c}" fill-opacity="1">${initials}</text>
+  </svg>`;
+}
+
+function load() {
+  try {
+    const s = localStorage.getItem('hertaVault');
+    if (s) {
+      const parsed = JSON.parse(s);
+      state = { ...state, ...parsed };
+    }
+  } catch(e) {}
+}
+function save() {
+  try { localStorage.setItem('hertaVault', JSON.stringify(state)); } catch(e) {}
+}
+load();
+
+// ===== BG IMAGE =====
+// Try to use the uploaded Herta image via the data URL stored in state,
+// otherwise use a CSS gradient fallback
+function initBg() {
+  const bg = document.getElementById('bgImg');
+  if (state.bgImage) {
+    bg.src = state.bgImage;
+    bg.style.display = 'block';
+  } else {
+    // Prompt user on first load
+    bg.style.display = 'none';
+    document.querySelector('.bg-wrap').style.background =
+      'linear-gradient(135deg, #0d0b1a 0%, #1a1440 40%, #0d0b1a 100%)';
+  }
+}
+
+// ===== PAGE ROUTING =====
+let currentPage = 'main-menu';
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const bgWrap = document.getElementById('bgWrap');
+  bgWrap.classList.toggle('blurred', id !== 'main-menu');
+  currentPage = id;
+  // Persist last page so refresh returns here
+  try { localStorage.setItem('hertaVault_page', id); } catch(e) {}
+  if (id === 'vault-page') renderVault();
+  if (id === 'manage-page') renderManage();
+  if (id === 'savings-page') { renderSavings(); renderLog(); }
+}
+// Restore last page on load
+(function restoreLastPage() {
+  try {
+    const last = localStorage.getItem('hertaVault_page');
+    // detail-page needs an entry id we don't restore cleanly, fallback to vault
+    const safe = ['main-menu','savings-page','vault-page','manage-page'];
+    if (last && safe.includes(last)) showPage(last);
+  } catch(e) {}
+})();
+
+// ===== TOAST =====
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' '+type : '');
+  setTimeout(() => t.className = 'toast', 2500);
+}
+
+// ===== SAVINGS =====
+function renderSavings() {
+  document.getElementById('savingsAmount').textContent = Number(state.savings).toLocaleString();
+}
+function renderLog() {
+  const list = document.getElementById('logList');
+  if (!state.log.length) {
+    list.innerHTML = '<div style="color:var(--herta-lilac);font-family:\'Crimson Pro\',serif;font-style:italic;font-size:0.88rem;padding:8px 4px;">No transactions yet.</div>';
+    return;
+  }
+  list.innerHTML = state.log.slice().reverse().slice(0, 20).map(l => `
+    <div class="log-item">
+      <span class="log-op ${l.op === '+' ? 'plus' : 'minus'}">${l.op} ₱${Number(l.amt).toLocaleString()}</span>
+      <span style="color:var(--herta-pale);font-size:0.9rem;">= ₱${Number(l.after).toLocaleString()}</span>
+      <span class="log-time">${l.time}</span>
+    </div>
+  `).join('');
+}
+function savingsOp(op) {
+  const input = document.getElementById('savingsInput');
+  const raw = input.value.trim();
+  if (!raw || !/^\d+$/.test(raw)) {
+    toast('⚠️ Enter a whole number only!', 'error');
+    return;
+  }
+  const amt = parseInt(raw, 10);
+  if (amt <= 0) { toast('⚠️ Amount must be greater than 0', 'error'); return; }
+  if (op === 'sub' && amt > state.savings) {
+    toast('⚠️ Not enough balance!', 'error'); return;
+  }
+  const before = state.savings;
+  state.savings = op === 'add' ? state.savings + amt : state.savings - amt;
+  const now = new Date();
+  state.log.push({
+    op: op === 'add' ? '+' : '-',
+    amt,
+    before,
+    after: state.savings,
+    time: now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+  });
+  save();
+  renderSavings();
+  renderLog();
+  input.value = '';
+  toast(op === 'add' ? `✓ Added ₱${amt.toLocaleString()}` : `✓ Subtracted ₱${amt.toLocaleString()}`, 'success');
+}
+// Validate: int only
+document.getElementById('savingsInput').addEventListener('input', function() {
+  this.value = this.value.replace(/[^0-9]/g, '');
+});
+renderSavings();
+
+// ===== VAULT =====
+function getIcon(entry) {
+  if (entry.icon) return `<img src="${entry.icon}" alt="${entry.name}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`;
+  return makePlaceholder(entry.name, entry.color);
+}
+async function quickUploadIcon(entryId, e) {
+  if (e) e.stopPropagation();
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = async () => {
+    if (!inp.files[0]) return;
+    const data = await fileToBase64(inp.files[0]);
+    const idx = state.entries.findIndex(x => x.id === entryId);
+    if (idx >= 0) {
+      state.entries[idx].icon = data;
+      save();
+      toast('✓ Icon updated!', 'success');
+      if (currentPage === 'vault-page') renderVault();
+      else if (currentPage === 'manage-page') renderManage();
+      else if (currentPage === 'detail-page') showDetail(entryId);
+    }
+  };
+  inp.click();
+}
+function renderVault() {
+  const grid = document.getElementById('vaultGrid');
+  grid.innerHTML = state.entries.map(e => `
+    <div class="app-btn" data-color="${e.color||'purple'}" onclick="showDetail('${e.id}')">
+      <div class="app-ico" title="Click to change icon" onclick="quickUploadIcon('${e.id}',event)" style="cursor:pointer;position:relative;overflow:hidden;" onmouseenter="this.querySelector('.ico-hover')&&(this.querySelector('.ico-hover').style.opacity='1')" onmouseleave="this.querySelector('.ico-hover')&&(this.querySelector('.ico-hover').style.opacity='0')">
+        ${getIcon(e)}
+        <div class="ico-hover" style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;border-radius:10px;opacity:0;transition:opacity 0.2s;font-size:0.75rem;color:#d4c8f0;pointer-events:none;">📷</div>
+      </div>
+      <div>
+        <div class="app-name">${e.name}</div>
+        <div class="app-cat">${typeLabel(e.type)}</div>
+      </div>
+    </div>
+  `).join('') + `
+    <div class="vault-manage-btn" onclick="showPage('manage-page')">⚙️ Manage Vault</div>
+  `;
+}
+function typeLabel(t) {
+  return { payment: 'Payment', social: 'Profile', game: 'Game Account', other: 'Other' }[t] || t;
+}
+
+// ===== DETAIL =====
+function showDetail(id) {
+  const e = state.entries.find(x => x.id === id);
+  if (!e) return;
+  const container = document.getElementById('detailContainer');
+  let content = '';
+
+  if (e.type === 'payment') {
+    content = e.qr
+      ? `<div class="detail-field"><div class="detail-field-label">QR Code</div></div>
+         <div class="detail-qr"><img src="${e.qr}" alt="QR Code"></div>`
+      : `<div style="color:var(--herta-lilac);font-family:'Crimson Pro',serif;font-style:italic;">No QR code uploaded yet. Go to Manage to add one.</div>`;
+    if (e.acct) content += `<div class="detail-field"><div class="detail-field-label">Account</div><div class="detail-field-value">${e.acct}</div></div>`;
+  } else if (e.type === 'social') {
+    if (e.profileImg) content += `<div class="detail-qr"><img src="${e.profileImg}" alt="Profile"></div>`;
+    if (e.link) content += `<div class="detail-field"><div class="detail-field-label">Profile Link</div><div class="detail-field-value"><a href="${e.link}" target="_blank" class="detail-link">${e.link}</a></div></div>`;
+    if (!e.profileImg && !e.link) content = `<div style="color:var(--herta-lilac);font-family:'Crimson Pro',serif;font-style:italic;">No data yet. Go to Manage to add info.</div>`;
+  } else if (e.type === 'game') {
+    if (e.uid) content += `<div class="detail-field"><div class="detail-field-label">UID</div><div class="detail-field-value" style="font-family:'Cinzel Decorative',serif;font-size:1.3rem;color:var(--herta-gold-light);">${e.uid}</div></div>`;
+    if (e.server) content += `<div class="detail-field"><div class="detail-field-label">Server / Region</div><div class="detail-field-value">${e.server}</div></div>`;
+    if (e.showcase && e.showcase.length) {
+      content += `<div class="detail-field"><div class="detail-field-label">Showcase</div></div>
+        <div class="showcase-grid">${e.showcase.map(img => `<div class="showcase-img"><img src="${img}" alt=""></div>`).join('')}</div>`;
+    }
+    if (!e.uid && !e.server && (!e.showcase || !e.showcase.length)) {
+      content = `<div style="color:var(--herta-lilac);font-family:'Crimson Pro',serif;font-style:italic;">No data yet. Go to Manage to add info.</div>`;
+    }
+  } else if (e.type === 'other' && e.customFields) {
+    content = e.customFields.filter(f=>f.label&&f.value).map(f =>
+      `<div class="detail-field"><div class="detail-field-label">${f.label}</div><div class="detail-field-value">${f.value}</div></div>`
+    ).join('') || `<div style="color:var(--herta-lilac);font-family:'Crimson Pro',serif;font-style:italic;">No fields yet.</div>`;
+  }
+
+  if (e.notes) content += `<div class="detail-field"><div class="detail-field-label">Notes</div><div class="detail-field-value" style="font-family:'Crimson Pro',serif;font-style:italic;">${e.notes}</div></div>`;
+
+  container.innerHTML = `
+    <div class="detail-header">
+      <div class="detail-icon" title="Click to change icon" onclick="quickUploadIcon('${e.id}',event);setTimeout(()=>showDetail('${e.id}'),400)" style="cursor:pointer;position:relative;" onmouseenter="this.querySelector('.ico-hover')&&(this.querySelector('.ico-hover').style.opacity='1')" onmouseleave="this.querySelector('.ico-hover')&&(this.querySelector('.ico-hover').style.opacity='0')">
+        ${getIcon(e)}
+        <div class="ico-hover" style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;border-radius:16px;opacity:0;transition:opacity 0.2s;font-size:0.8rem;color:#d4c8f0;pointer-events:none;">📷</div>
+      </div>
+      <div class="detail-title-wrap">
+        <h2>${e.name}</h2>
+        <p>${typeLabel(e.type)}</p>
+      </div>
+    </div>
+    <div class="detail-content">${content}</div>
+  `;
+  showPage('detail-page');
+  document.querySelector('#detail-page .back-btn').onclick = () => showPage('vault-page');
+}
+
+// ===== MANAGE =====
+function renderManage() {
+  const list = document.getElementById('manageList');
+  list.innerHTML = state.entries.map(e => `
+    <div class="manage-item">
+      <div class="m-icon" title="Click to change icon" onclick="quickUploadIcon('${e.id}',event)" style="cursor:pointer;position:relative;" onmouseenter="this.querySelector('.ico-hover')&&(this.querySelector('.ico-hover').style.opacity='1')" onmouseleave="this.querySelector('.ico-hover')&&(this.querySelector('.ico-hover').style.opacity='0')">
+        ${getIcon(e)}
+        <div class="ico-hover" style="position:absolute;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;border-radius:10px;opacity:0;transition:opacity 0.2s;font-size:0.7rem;color:#d4c8f0;pointer-events:none;">📷</div>
+      </div>
+      <div class="m-info">
+        <div class="m-name">${e.name}</div>
+        <div class="m-type">${typeLabel(e.type)}</div>
+      </div>
+      <div class="manage-actions">
+        <button class="btn-icon" title="Edit" onclick="openEditModal('${e.id}')">✏️</button>
+        <button class="btn-icon del" title="Delete" onclick="openDelete('${e.id}')">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== EDIT/ADD MODAL =====
+let editingId = null;
+let tempShowcase = [];
+let tempIconData = null;
+let tempQrData = null;
+let tempProfileImgData = null;
+
+function openAddModal() {
+  editingId = null;
+  tempShowcase = []; tempIconData = null; tempQrData = null; tempProfileImgData = null;
+  document.getElementById('editOverlayTitle').textContent = 'Add New Entry';
+  resetForm();
+  document.getElementById('editOverlay').classList.add('active');
+  updateFormFields();
+}
+function openEditModal(id) {
+  const e = state.entries.find(x => x.id === id);
+  if (!e) return;
+  editingId = id;
+  tempShowcase = e.showcase ? [...e.showcase] : [];
+  tempIconData = e.icon || null;
+  tempQrData = e.qr || null;
+  tempProfileImgData = e.profileImg || null;
+
+  document.getElementById('editOverlayTitle').textContent = `Edit: ${e.name}`;
+  document.getElementById('ef-name').value = e.name;
+  document.getElementById('ef-type').value = e.type || 'other';
+  document.getElementById('ef-color').value = e.color || 'purple';
+  document.getElementById('ef-notes').value = e.notes || '';
+
+  // icon preview
+  document.getElementById('iconPreview').innerHTML = e.icon
+    ? `<img class="upload-preview-img" src="${e.icon}">` : '';
+
+  // type specific
+  updateFormFields();
+  if (e.type === 'payment') {
+    document.getElementById('ef-acct').value = e.acct || '';
+    document.getElementById('qrPreview').innerHTML = e.qr
+      ? `<img class="upload-preview-img" src="${e.qr}">` : '';
+  } else if (e.type === 'social') {
+    document.getElementById('ef-link').value = e.link || '';
+    document.getElementById('profileImgPreview').innerHTML = e.profileImg
+      ? `<img class="upload-preview-img" src="${e.profileImg}">` : '';
+  } else if (e.type === 'game') {
+    document.getElementById('ef-uid').value = e.uid || '';
+    document.getElementById('ef-server').value = e.server || '';
+    renderShowcaseList();
+  } else if (e.type === 'other') {
+    renderCustomFields(e.customFields || []);
+  }
+
+  document.getElementById('editOverlay').classList.add('active');
+}
+function resetForm() {
+  ['ef-name','ef-acct','ef-link','ef-uid','ef-server','ef-notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('ef-type').value = 'payment';
+  document.getElementById('ef-color').value = 'purple';
+  ['iconPreview','qrPreview','profileImgPreview'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '';
+  });
+  document.getElementById('showcaseList').innerHTML = '';
+  document.getElementById('customFields').innerHTML = '';
+}
+function updateFormFields() {
+  const type = document.getElementById('ef-type').value;
+  ['payment','social','game','other'].forEach(t => {
+    document.getElementById('fs-'+t).classList.toggle('visible', t === type);
+  });
+}
+function closeOverlay(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+// File to base64
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+async function previewIcon(input) {
+  if (!input.files[0]) return;
+  tempIconData = await fileToBase64(input.files[0]);
+  document.getElementById('iconPreview').innerHTML = `<img class="upload-preview-img" src="${tempIconData}">`;
+}
+async function previewSingleFile(input, previewId) {
+  if (!input.files[0]) return;
+  const data = await fileToBase64(input.files[0]);
+  if (input.id === 'ef-qr') tempQrData = data;
+  if (input.id === 'ef-profile-img') tempProfileImgData = data;
+  document.getElementById(previewId).innerHTML = `<img class="upload-preview-img" src="${data}">`;
+}
+async function addShowcaseImages(input) {
+  for (const file of input.files) {
+    const data = await fileToBase64(file);
+    tempShowcase.push(data);
+  }
+  renderShowcaseList();
+}
+function renderShowcaseList() {
+  const list = document.getElementById('showcaseList');
+  list.innerHTML = tempShowcase.map((img, i) => `
+    <div class="multi-upload-item">
+      <img src="${img}" alt="">
+      <span>Image ${i+1}</span>
+      <button class="del-img" onclick="removeShowcase(${i})">✕</button>
+    </div>
+  `).join('');
+}
+function removeShowcase(i) {
+  tempShowcase.splice(i, 1);
+  renderShowcaseList();
+}
+
+// Custom fields
+function renderCustomFields(fields) {
+  const container = document.getElementById('customFields');
+  container.innerHTML = fields.map((f, i) => `
+    <div class="dyn-field-row">
+      <input class="form-input" placeholder="Label" value="${f.label||''}" oninput="updateCF(${i},'label',this.value)" style="flex:0 0 38%;">
+      <input class="form-input" placeholder="Value" value="${f.value||''}" oninput="updateCF(${i},'value',this.value)">
+      <button class="btn-del-field" onclick="removeCF(${i})">✕</button>
+    </div>
+  `).join('');
+}
+let _cfFields = [];
+function addCustomField() {
+  _cfFields.push({label:'',value:''});
+  renderCustomFields(_cfFields);
+}
+function updateCF(i, key, val) { _cfFields[i][key] = val; }
+function removeCF(i) { _cfFields.splice(i,1); renderCustomFields(_cfFields); }
+
+function generateId(name) {
+  return name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'') + '-' + Date.now().toString(36);
+}
+
+function saveEntry() {
+  const name = document.getElementById('ef-name').value.trim();
+  if (!name) { toast('⚠️ Name is required!', 'error'); return; }
+  const type = document.getElementById('ef-type').value;
+  const color = document.getElementById('ef-color').value;
+  const notes = document.getElementById('ef-notes').value.trim();
+
+  let entry = { name, type, color, notes, icon: tempIconData };
+
+  if (type === 'payment') {
+    entry.qr = tempQrData;
+    entry.acct = document.getElementById('ef-acct').value.trim();
+  } else if (type === 'social') {
+    entry.link = document.getElementById('ef-link').value.trim();
+    entry.profileImg = tempProfileImgData;
+  } else if (type === 'game') {
+    entry.uid = document.getElementById('ef-uid').value.trim();
+    entry.server = document.getElementById('ef-server').value.trim();
+    entry.showcase = [...tempShowcase];
+  } else if (type === 'other') {
+    entry.customFields = [..._cfFields];
+  }
+
+  if (editingId) {
+    const idx = state.entries.findIndex(x => x.id === editingId);
+    if (idx >= 0) {
+      state.entries[idx] = { ...state.entries[idx], ...entry };
+      toast('✓ Entry updated!', 'success');
+    }
+  } else {
+    entry.id = generateId(name);
+    state.entries.push(entry);
+    toast('✓ Entry added!', 'success');
+  }
+  save();
+  closeOverlay('editOverlay');
+  renderManage();
+}
+
+// ===== DELETE =====
+let deleteTarget = null;
+function openDelete(id) {
+  deleteTarget = id;
+  const e = state.entries.find(x => x.id === id);
+  document.getElementById('deleteEntryName').textContent = e ? e.name : id;
+  document.getElementById('deleteOverlay').classList.add('active');
+}
+function confirmDelete() {
+  if (!deleteTarget) return;
+  state.entries = state.entries.filter(x => x.id !== deleteTarget);
+  deleteTarget = null;
+  save();
+  closeOverlay('deleteOverlay');
+  renderManage();
+  toast('Entry deleted.', '');
+}
+
+// ===== BG SETUP =====
+// Convert the uploaded image to base64 and store
+// (User must re-upload once via prompt below or we use gradient)
+function setupBgFromFile(file) {
+  fileToBase64(file).then(data => {
+    state.bgImage = data;
+    save();
+    document.getElementById('bgImg').src = data;
+    document.getElementById('bgImg').style.display = 'block';
+    toast('✓ Background set!', 'success');
+  });
+}
+
+// ===== FIXED CORNER BUTTONS =====
+(function() {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:50;display:flex;flex-direction:column;gap:10px;align-items:flex-end;';
+
+  // Save button
+  const saveBtn = document.createElement('button');
+  saveBtn.id = 'globalSaveBtn';
+  saveBtn.title = 'Save all changes';
+  saveBtn.style.cssText = 'background:linear-gradient(135deg,rgba(42,31,94,0.92),rgba(74,58,138,0.92));border:1px solid rgba(180,150,255,0.5);border-radius:10px;padding:10px 18px;color:#d4c8f0;font-family:Rajdhani,sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;backdrop-filter:blur(10px);display:flex;align-items:center;gap:7px;transition:all 0.2s;letter-spacing:0.05em;box-shadow:0 4px 20px rgba(120,80,220,0.25);';
+  saveBtn.innerHTML = '💾 Save';
+  saveBtn.onclick = () => {
+    save();
+    // Also persist current page
+    try { localStorage.setItem('hertaVault_page', currentPage); } catch(e) {}
+    // Animate button
+    saveBtn.innerHTML = '✓ Saved!';
+    saveBtn.style.borderColor = 'rgba(100,220,130,0.7)';
+    saveBtn.style.color = '#a0f0b0';
+    saveBtn.style.boxShadow = '0 4px 20px rgba(60,180,80,0.35)';
+    setTimeout(() => {
+      saveBtn.innerHTML = '💾 Save';
+      saveBtn.style.borderColor = 'rgba(180,150,255,0.5)';
+      saveBtn.style.color = '#d4c8f0';
+      saveBtn.style.boxShadow = '0 4px 20px rgba(120,80,220,0.25)';
+    }, 1800);
+  };
+  saveBtn.onmouseenter = () => { saveBtn.style.transform='translateY(-2px)'; saveBtn.style.boxShadow='0 8px 28px rgba(120,80,220,0.45)'; };
+  saveBtn.onmouseleave = () => { saveBtn.style.transform=''; saveBtn.style.boxShadow='0 4px 20px rgba(120,80,220,0.25)'; };
+  wrap.appendChild(saveBtn);
+
+  // BG button
+  const bgBtn = document.createElement('button');
+  bgBtn.title = 'Set background image';
+  bgBtn.style.cssText = 'background:rgba(20,15,45,0.75);border:1px solid rgba(180,150,255,0.25);border-radius:10px;padding:9px 14px;color:#8a75c0;font-family:Rajdhani,sans-serif;font-size:0.78rem;cursor:pointer;backdrop-filter:blur(10px);display:flex;align-items:center;gap:6px;transition:all 0.2s;';
+  bgBtn.innerHTML = '🖼️ Set BG';
+  bgBtn.onclick = () => { const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.onchange=e=>setupBgFromFile(e.target.files[0]); inp.click(); };
+  bgBtn.onmouseenter = () => { bgBtn.style.borderColor='rgba(180,150,255,0.6)'; bgBtn.style.color='#b09fd8'; };
+  bgBtn.onmouseleave = () => { bgBtn.style.borderColor='rgba(180,150,255,0.25)'; bgBtn.style.color='#8a75c0'; };
+  wrap.appendChild(bgBtn);
+
+  document.body.appendChild(wrap);
+})();
+
+initBg();
+</script>
+</body>
+</html>
