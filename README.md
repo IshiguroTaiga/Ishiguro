@@ -1,4 +1,4 @@
-# 🔮 The Herta's Vault
+# 🔮 Ishiguro's Vault
 
 > *"Insignificant creatures... at least your data is organized."*
 
